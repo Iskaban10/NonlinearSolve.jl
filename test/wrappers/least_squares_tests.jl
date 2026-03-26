@@ -116,3 +116,25 @@ end
     sol = solve(prob_sa, FastLevenbergMarquardtJL())
     @test maximum(abs, sol.resid) < 1.0e-6
 end
+
+@testitem "Sparse Rectangular NLLS" setup = [WrapperNLLSSetup] tags = [:wrappers] begin
+    using SparseArrays, LinearAlgebra
+
+    # Defines a rectangular problem (3 equations, 2 variables) forming a rectangular Jacobian
+    function f!(res, u, p)
+        res[1] = u[1]^2 - 1.0
+        res[2] = u[2]^2 - 1.0
+        res[3] = u[1] + u[2] - 2.0
+    end
+
+    jac_proto = sparse([1, 2, 3, 3], [1, 2, 1, 2], [1.0, 1.0, 1.0, 1.0], 3, 2)
+    
+    u0 = [0.1, 0.1]
+    nlf = NonlinearFunction(f!; jac_prototype = jac_proto)
+    prob = NonlinearLeastSquaresProblem(nlf, u0)
+
+    sol = solve(prob, GaussNewton(); maxiters = 100, abstol = 1e-8)
+
+    @test SciMLBase.successful_retcode(sol)
+    @test maximum(abs, sol.resid) < 1.0e-6
+end

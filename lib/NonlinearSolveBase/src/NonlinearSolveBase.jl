@@ -11,6 +11,7 @@ using Adapt: WrappedArray
 using ArrayInterface: ArrayInterface
 using DifferentiationInterface: DifferentiationInterface, Constant
 using StaticArraysCore: StaticArray, SMatrix, SArray, MArray
+using SparseArrays: issparse
 
 using CommonSolve: CommonSolve, init
 using EnzymeCore: EnzymeCore
